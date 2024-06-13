@@ -1,29 +1,31 @@
 const express = require('express');
 const { fetchPosts } = require('./posts.service');
 const { fetchUserById } = require('../users/users.service');
-
+const axios = require('axios').default;
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-  const posts = await fetchPosts();
+  try {
+    const posts = await fetchPosts();
+    console.log('Fetched posts:', posts);
 
-  const postsWithImages = posts.reduce((acc, post) => {
-    // TODO use this route to fetch photos for each post
-    // axios.get(`https://jsonplaceholder.typicode.com/albums/${post.id}/photos`);
-    return [
-      ...acc,
-      {
-        ...post,
-        images: [
-          { url: 'https://picsum.photos/200/300' },
-          { url: 'https://picsum.photos/200/300' },
-          { url: 'https://picsum.photos/200/300' },
-        ],
-      },
-    ];
-  }, []);
+    const postsWithImagesAndUsers = await Promise.all(
+      posts.map(async (post) => {
+        const { data: photos } = await axios.get(`https://jsonplaceholder.typicode.com/albums/${post.id}/photos`);
+  
+        const user = await fetchUserById(post.id);
+        return {
+          ...post,
+          images: photos.slice(0, 3).map(photo => ({ url: photo.url })), // Take first 3 photos for the post
+          user, // Include user data in the post
+        };
+      })
+    );
 
-  res.json(postsWithImages);
+    res.json(postsWithImagesAndUsers);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch posts' });
+  }
 });
 
-module.exports = router;
+module.exports=router;

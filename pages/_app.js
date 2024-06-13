@@ -1,9 +1,36 @@
 import React from 'react';
+import PropTypes from 'prop-types';
+import { WindowWidthProvider } from '../components/hooks/useWindowWidth';
 
-const App = ({ Component, pageProps }) => (
-  <React.Fragment>
-    <Component {...pageProps} />
-  </React.Fragment>
-);
+function MyApp({ Component, pageProps }) {
+  return (
+    <WindowWidthProvider>
+      <Component {...pageProps} />
+    </WindowWidthProvider>
+  );
+}
 
-export default App;
+MyApp.propTypes = {
+  Component: PropTypes.elementType.isRequired,
+  pageProps: PropTypes.object,
+};
+
+MyApp.defaultProps = {
+  pageProps: {},
+};
+
+export default MyApp;
+
+
+// import React from 'react';
+// import { WindowWidthProvider } from '../components/hooks/useWindowWidth';
+
+// function MyApp({ Component, pageProps }) {
+//   return (
+//     <WindowWidthProvider>
+//       <Component {...pageProps} />
+//     </WindowWidthProvider>
+//   );
+// }
+
+// export default MyApp;

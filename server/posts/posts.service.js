@@ -23,4 +23,4 @@ async function fetchPosts(params) {
   return posts;
 }
 
-module.exports = { fetchPosts };
+module.exports ={fetchPosts};
